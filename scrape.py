@@ -22,6 +22,9 @@ app = Firecrawl()
 
 
 def _to_dict(obj):
+    from datetime import datetime
+    if isinstance(obj, datetime):
+        return obj.isoformat()
     if hasattr(obj, "__dict__"):
         return _to_dict(vars(obj))
     if isinstance(obj, dict):
@@ -83,12 +86,10 @@ def cmd_crawl(url: str, limit: int):
     os.makedirs(out_dir, exist_ok=True)
 
     print(f"[crawl] url={url!r}  host={host}  limit={limit}")
-    result = app.crawl_url(
+    result = app.crawl(
         url,
-        params={
-            "limit": limit,
-            "scrapeOptions": {"formats": ["markdown"]},
-        },
+        limit=limit,
+        scrape_options={"formats": ["markdown"]},
     )
     payload = _to_dict(result)
 
@@ -100,7 +101,7 @@ def cmd_crawl(url: str, limit: int):
     pages = payload.get("data") or []
     saved = 0
     for page in pages:
-        page_url = page.get("url") or page.get("sourceURL") or ""
+        page_url = (page.get("metadata") or {}).get("url") or page.get("url") or ""
         markdown = page.get("markdown") or ""
         if not markdown:
             continue
@@ -113,17 +114,26 @@ def cmd_crawl(url: str, limit: int):
     print(f"[crawl] saved {saved} markdown file(s) under {out_dir}/")
 
 
+def cmd_crawl_all(hosts_file: str, limit: int):
+    with open(hosts_file) as f:
+        hosts = [line.strip() for line in f if line.strip()]
+    for host in hosts:
+        cmd_crawl(f"https://{host}/", limit)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Firecrawl ingestion for RAG pipeline")
-    parser.add_argument("input", help="Query string (search) or URL (crawl)")
-    parser.add_argument("mode", choices=["search", "crawl"])
+    parser.add_argument("input", help="Query string (search/crawl) or hosts file path (crawl-all)")
+    parser.add_argument("mode", choices=["search", "crawl", "crawl-all"])
     parser.add_argument("--limit", type=int, default=50)
     args = parser.parse_args()
 
     if args.mode == "search":
         cmd_search(args.input, args.limit)
-    else:
+    elif args.mode == "crawl":
         cmd_crawl(args.input, args.limit)
+    else:
+        cmd_crawl_all(args.input, args.limit)
 
 
 if __name__ == "__main__":
