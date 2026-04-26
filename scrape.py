@@ -77,7 +77,7 @@ def cmd_search(query: str, limit: int):
         print(f"  {h}")
 
 
-def cmd_crawl(url: str, limit: int):
+def cmd_crawl(url: str, limit: int | None):
     host = urlparse(url).netloc
     if not host:
         raise ValueError(f"Cannot parse host from URL: {url!r}")
@@ -85,12 +85,11 @@ def cmd_crawl(url: str, limit: int):
     out_dir = os.path.join("crawl_output", host)
     os.makedirs(out_dir, exist_ok=True)
 
-    print(f"[crawl] url={url!r}  host={host}  limit={limit}")
-    result = app.crawl(
-        url,
-        limit=limit,
-        scrape_options={"formats": ["markdown"]},
-    )
+    print(f"[crawl] url={url!r}  host={host}  limit={limit or 'unlimited'}")
+    kwargs = {"scrape_options": {"formats": ["markdown"]}}
+    if limit is not None:
+        kwargs["limit"] = limit
+    result = app.crawl(url, **kwargs)
     payload = _to_dict(result)
 
     index_path = os.path.join(out_dir, f"{host}.json")
@@ -114,7 +113,7 @@ def cmd_crawl(url: str, limit: int):
     print(f"[crawl] saved {saved} markdown file(s) under {out_dir}/")
 
 
-def cmd_crawl_all(hosts_file: str, limit: int):
+def cmd_crawl_all(hosts_file: str, limit: int | None):
     with open(hosts_file) as f:
         hosts = [line.strip() for line in f if line.strip()]
     for host in hosts:
@@ -125,7 +124,7 @@ def main():
     parser = argparse.ArgumentParser(description="Firecrawl ingestion for RAG pipeline")
     parser.add_argument("input", help="Query string (search/crawl) or hosts file path (crawl-all)")
     parser.add_argument("mode", choices=["search", "crawl", "crawl-all"])
-    parser.add_argument("--limit", type=int, default=50)
+    parser.add_argument("--limit", type=int, default=None)
     args = parser.parse_args()
 
     if args.mode == "search":
