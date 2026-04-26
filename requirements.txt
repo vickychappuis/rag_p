@@ -1,3 +1,4 @@
 firecrawl-py==4.23.0
 python-dotenv==1.2.2
 docling==2.91.0
+chonkie[semantic]==1.6.4
