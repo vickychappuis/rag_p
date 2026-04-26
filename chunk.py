@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 import json
 import os
+import re
 from pathlib import Path
 
 from chonkie import SemanticChunker
+
+
+def clean_markdown(text):
+    text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
+    text = re.sub(r"\[([^\]]+)\]\(.*?\)", r"\1", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 chunker = SemanticChunker(
     embedding_model="minishlab/potion-base-32M",
@@ -19,8 +27,8 @@ all_chunks = []
 
 for src_dir in SOURCE_DIRS:
     for md_file in sorted(Path(src_dir).rglob("*.md")):
-        text = md_file.read_text()
-        if not text.strip():
+        text = clean_markdown(md_file.read_text())
+        if not text:
             continue
 
         chunks = chunker.chunk(text)
