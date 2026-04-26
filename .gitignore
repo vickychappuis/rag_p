@@ -14,3 +14,8 @@ __pycache__/
 # Generated outputs
 discovery_output/
 crawl_output/
+pdf_output/
+pdfs/
+
+# Claude Code local settings
+.claude/settings.local.json
