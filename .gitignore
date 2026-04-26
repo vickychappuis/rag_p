@@ -11,11 +11,12 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Generated outputs
-discovery_output/
-crawl_output/
-pdf_output/
+# Inputs and generated outputs
 pdfs/
+data/
+crawl_output/
+discovery_output/
+pdf_output/
 
 # Claude Code local settings
 .claude/settings.local.json

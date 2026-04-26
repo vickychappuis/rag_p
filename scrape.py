@@ -42,13 +42,13 @@ def _safe_filename(url: str) -> str:
 
 
 def cmd_search(query: str, limit: int):
-    os.makedirs("discovery_output", exist_ok=True)
+    os.makedirs("data/discovery", exist_ok=True)
 
     print(f"[search] query={query!r}  limit={limit}")
     raw = app.search(query, limit=limit)
     payload = _to_dict(raw)
 
-    out_path = "discovery_output/search_output.json"
+    out_path = "data/discovery/search_output.json"
     with open(out_path, "w") as f:
         json.dump(payload, f, indent=2)
     print(f"[search] saved raw response → {out_path}")
@@ -67,7 +67,7 @@ def cmd_search(query: str, limit: int):
             if host:
                 hosts.add(host)
 
-    hosts_path = "discovery_output/hosts.txt"
+    hosts_path = "data/discovery/hosts.txt"
     with open(hosts_path, "w") as f:
         for host in sorted(hosts):
             f.write(host + "\n")
@@ -82,7 +82,7 @@ def cmd_crawl(url: str, limit: int | None):
     if not host:
         raise ValueError(f"Cannot parse host from URL: {url!r}")
 
-    out_dir = os.path.join("crawl_output", host)
+    out_dir = os.path.join("data/web", host)
     os.makedirs(out_dir, exist_ok=True)
 
     print(f"[crawl] url={url!r}  host={host}  limit={limit or 'unlimited'}")
