@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 
-load_dotenv()
+BASE = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE / ".env")
 
 COLLECTION = os.environ["COLLECTION_NAME"]
 QDRANT_URL = os.environ["QDRANT_URL"]

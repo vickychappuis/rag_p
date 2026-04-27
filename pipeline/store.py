@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_core.documents import Document
@@ -9,11 +10,13 @@ from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 
-load_dotenv()
+BASE = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE / ".env")
 
 COLLECTION = os.environ["COLLECTION_NAME"]
 QDRANT_URL = os.environ["QDRANT_URL"]
-CHUNKS_PATH = "data/chunks/chunks.json"
+CHUNKS_PATH = BASE / "data/chunks/chunks.json"
 
 EMBEDDING_MODEL = os.environ["EMBEDDING_MODEL"]
 EMBEDDING_DIMS = {

@@ -7,7 +7,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 from chonkie import SemanticChunker
 
-load_dotenv()
+BASE = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE / ".env")
 
 CHUNK_OVERLAP = int(os.environ["CHUNK_OVERLAP"])
 
@@ -23,14 +25,14 @@ chunker = SemanticChunker(
     chunk_size=512,
 )
 
-SOURCE_DIRS = ["data/web", "data/pdfs"]
-OUT_DIR = Path("data/chunks")
+SOURCE_DIRS = [BASE / "data/web", BASE / "data/pdfs"]
+OUT_DIR = BASE / "data/chunks"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 all_chunks = []
 
 for src_dir in SOURCE_DIRS:
-    for md_file in sorted(Path(src_dir).rglob("*.md")):
+    for md_file in sorted(src_dir.rglob("*.md")):
         text = clean_markdown(md_file.read_text())
         if not text:
             continue
@@ -40,12 +42,12 @@ for src_dir in SOURCE_DIRS:
             overlap = chunks[i - 1].text[-CHUNK_OVERLAP:] if i > 0 else ""
             text_with_overlap = overlap + chunk.text if overlap else chunk.text
             all_chunks.append({
-                "source": str(md_file),
+                "source": str(md_file.relative_to(BASE)),
                 "chunk_index": i,
                 "text": text_with_overlap,
                 "token_count": chunk.token_count,
             })
-        print(f"[chunk] {md_file} → {len(chunks)} chunks")
+        print(f"[chunk] {md_file.relative_to(BASE)} → {len(chunks)} chunks")
 
 out_path = OUT_DIR / "chunks.json"
 with open(out_path, "w") as f:

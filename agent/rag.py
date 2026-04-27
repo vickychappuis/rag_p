@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_cohere import CohereRerank
@@ -8,9 +9,11 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 
-from prompt import RAG_PROMPT
+BASE = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+load_dotenv(BASE / ".env")
+
+from prompt import RAG_PROMPT
 
 COLLECTION = os.environ["COLLECTION_NAME"]
 QDRANT_URL = os.environ["QDRANT_URL"]

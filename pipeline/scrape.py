@@ -3,21 +3,24 @@
 Minimal Firecrawl-based ingestion for RAG pipeline.
 
 Usage:
-    python scrape.py "site:promtior.ai" search --limit 20
-    python scrape.py https://www.promtior.ai/ crawl --limit 50
-    python scrape.py https://careers.promtior.ai/ crawl --limit 50
+    python pipeline/scrape.py "site:promtior.ai" search --limit 20
+    python pipeline/scrape.py https://www.promtior.ai/ crawl --limit 50
+    python pipeline/scrape.py https://careers.promtior.ai/ crawl --limit 50
 """
 
 import argparse
 import json
 import os
 import re
+from pathlib import Path
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from firecrawl import Firecrawl
 
-load_dotenv()
+BASE = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE / ".env")
 app = Firecrawl()
 
 
@@ -42,13 +45,14 @@ def _safe_filename(url: str) -> str:
 
 
 def cmd_search(query: str, limit: int):
-    os.makedirs("data/discovery", exist_ok=True)
+    discovery_dir = BASE / "data/discovery"
+    os.makedirs(discovery_dir, exist_ok=True)
 
     print(f"[search] query={query!r}  limit={limit}")
     raw = app.search(query, limit=limit)
     payload = _to_dict(raw)
 
-    out_path = "data/discovery/search_output.json"
+    out_path = discovery_dir / "search_output.json"
     with open(out_path, "w") as f:
         json.dump(payload, f, indent=2)
     print(f"[search] saved raw response → {out_path}")
@@ -67,7 +71,7 @@ def cmd_search(query: str, limit: int):
             if host:
                 hosts.add(host)
 
-    hosts_path = "data/discovery/hosts.txt"
+    hosts_path = discovery_dir / "hosts.txt"
     with open(hosts_path, "w") as f:
         for host in sorted(hosts):
             f.write(host + "\n")
@@ -82,7 +86,7 @@ def cmd_crawl(url: str, limit: int | None):
     if not host:
         raise ValueError(f"Cannot parse host from URL: {url!r}")
 
-    out_dir = os.path.join("data/web", host)
+    out_dir = BASE / "data/web" / host
     os.makedirs(out_dir, exist_ok=True)
 
     print(f"[crawl] url={url!r}  host={host}  limit={limit or 'unlimited'}")
@@ -92,7 +96,7 @@ def cmd_crawl(url: str, limit: int | None):
     result = app.crawl(url, **kwargs)
     payload = _to_dict(result)
 
-    index_path = os.path.join(out_dir, f"{host}.json")
+    index_path = out_dir / f"{host}.json"
     with open(index_path, "w") as f:
         json.dump(payload, f, indent=2)
     print(f"[crawl] saved index → {index_path}")
@@ -105,7 +109,7 @@ def cmd_crawl(url: str, limit: int | None):
         if not markdown:
             continue
         filename = _safe_filename(page_url)
-        md_path = os.path.join(out_dir, filename)
+        md_path = out_dir / filename
         with open(md_path, "w") as f:
             f.write(markdown)
         saved += 1
