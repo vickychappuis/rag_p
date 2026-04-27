@@ -1,17 +1,13 @@
 import os
-from pathlib import Path
 
-from dotenv import load_dotenv
 from langchain_cohere import CohereRerank
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient
 
+import agent.config  # noqa: F401 — loads .env and optionally SSM params
 from agent.prompt import RAG_PROMPT
-
-BASE = Path(__file__).resolve().parent.parent
-load_dotenv(BASE / ".env")
 
 client = QdrantClient(url=os.environ["QDRANT_URL"])
 embeddings = OpenAIEmbeddings(model=os.environ["EMBEDDING_MODEL"])

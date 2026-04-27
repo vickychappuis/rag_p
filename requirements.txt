@@ -1,11 +1,9 @@
-firecrawl-py==4.23.0
 python-dotenv==1.2.2
-docling==2.91.0
-chonkie[semantic]==1.6.4
-langchain-core==0.3.66
+langchain-core>=1.0.0
 langchain-qdrant==1.1.0
 langchain-cohere==0.5.1
 langchain-openai==1.2.1
 qdrant-client==1.17.1
 langserve[all]==0.3.3
 uvicorn==0.46.0
+boto3>=1.35.0

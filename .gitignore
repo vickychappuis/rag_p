@@ -18,5 +18,12 @@ crawl_output/
 discovery_output/
 pdf_output/
 
+# Terraform
+*.pem
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
 # Claude Code local settings
 .claude/settings.local.json
