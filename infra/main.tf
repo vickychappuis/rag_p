@@ -190,7 +190,7 @@ resource "aws_ssm_parameter" "chunk_overlap" {
 resource "aws_ssm_parameter" "root_path" {
   name  = "/promtior/root_path"
   type  = "String"
-  value = aws_apigatewayv2_stage.default.invoke_url
+  value = "https://rag.vickychappuis.dev"
 }
 
 # --- EC2 Instances ---
@@ -256,4 +256,37 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.main.id
   name        = "$default"
   auto_deploy = true
+}
+
+# --- Custom Domain ---
+
+resource "aws_acm_certificate" "rag" {
+  domain_name       = "rag.vickychappuis.dev"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "rag" {
+  certificate_arn = aws_acm_certificate.rag.arn
+}
+
+resource "aws_apigatewayv2_domain_name" "rag" {
+  domain_name = "rag.vickychappuis.dev"
+
+  domain_name_configuration {
+    certificate_arn = aws_acm_certificate.rag.arn
+    endpoint_type   = "REGIONAL"
+    security_policy = "TLS_1_2"
+  }
+
+  depends_on = [aws_acm_certificate_validation.rag]
+}
+
+resource "aws_apigatewayv2_api_mapping" "rag" {
+  api_id      = aws_apigatewayv2_api.main.id
+  domain_name = aws_apigatewayv2_domain_name.rag.id
+  stage       = aws_apigatewayv2_stage.default.id
 }
