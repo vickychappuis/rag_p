@@ -28,6 +28,8 @@ For the vector store, I chose Qdrant and hosted it on EC2. There are other optio
 
 For the agent part, I decided to just use an LLM. I didn't create an agent in LangChain, because we don't really need it for this particular assessment. It doesn't ask you for the agent to realize it has to use a vector search tool. So I just did the vector search automatically and passed the question along with the reference chunks to the LLM.
 
+The prompt follows best practices, OpenAI has prompt guides and best practices for each specific model, and I tend to check those when I write prompts. I like to keep prompts in a separate Python file — if someone wants to reuse them later or change them, they know exactly where to find them.
+
 One thing I added later was a re-ranker, because the chunks I was getting at first were not really good. They could still be improved: for example, cleaning up the content from the extraction that has some image tags in it. But I decided not to, because in a normal project I would have a talk with the client asking about these images — if they want them, if they're useful, and whether this cleanup could have a negative effect. Sometimes that happens when you think about a RAG project in a certain scope and type of documents, and then later you have a broader and more diverse set of documents, and the restrictions you put at first that helped in a small scope end up working against you.
 
 ### Deployment
