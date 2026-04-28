@@ -154,31 +154,31 @@ resource "aws_ssm_parameter" "collection_name" {
 resource "aws_ssm_parameter" "embedding_model" {
   name  = "/promtior/embedding_model"
   type  = "String"
-  value = "text-embedding-3-large"
+  value = var.embedding_model
 }
 
 resource "aws_ssm_parameter" "llm_model" {
   name  = "/promtior/llm_model"
   type  = "String"
-  value = "gpt-5.5"
+  value = var.llm_model
 }
 
 resource "aws_ssm_parameter" "top_k" {
   name  = "/promtior/top_k"
   type  = "String"
-  value = "10"
+  value = var.top_k
 }
 
 resource "aws_ssm_parameter" "rerank_model" {
   name  = "/promtior/rerank_model"
   type  = "String"
-  value = "rerank-v3.5"
+  value = var.rerank_model
 }
 
 resource "aws_ssm_parameter" "rerank_top_n" {
   name  = "/promtior/rerank_top_n"
   type  = "String"
-  value = "5"
+  value = var.rerank_top_n
 }
 
 resource "aws_ssm_parameter" "chunk_overlap" {

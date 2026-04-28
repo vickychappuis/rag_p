@@ -24,3 +24,28 @@ variable "cohere_api_key" {
   description = "Cohere API key"
   sensitive   = true
 }
+
+variable "llm_model" {
+  description = "OpenAI chat model ID"
+  default     = "gpt-5.5"
+}
+
+variable "embedding_model" {
+  description = "OpenAI embedding model ID"
+  default     = "text-embedding-3-large"
+}
+
+variable "rerank_model" {
+  description = "Cohere rerank model ID"
+  default     = "rerank-v3.5"
+}
+
+variable "top_k" {
+  description = "Number of chunks to retrieve from the vector store"
+  default     = "10"
+}
+
+variable "rerank_top_n" {
+  description = "Number of chunks to keep after reranking"
+  default     = "5"
+}
