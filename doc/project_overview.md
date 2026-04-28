@@ -46,3 +46,4 @@ For now, I decided to keep the ingestion part aside. If I had to continue with t
 - **Better references in the prompt**: Edit the prompt so that the answer refers you to the referenced links it got from the retrieved chunks.
 - **Better UI**: Show retrieved chunks in the interface, or even have an S3 service where we save files (like the PDF from the assessment) and make them easily accessible to the user when we refer to them in an answer.
 - **Authentication**: For now I just have a spend limit on the OpenAI API, but we should add proper auth to manage access.
+- **VPC**: Ideally the EC2 instances would live in a private subnet with no public IPs, and the API Gateway would reach the backend via VPC Link. I skipped this for cost reasons.
